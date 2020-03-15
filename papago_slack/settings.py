@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 """
 
 import os
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -69,6 +70,9 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'papago_slack.wsgi.application'
 
+# import .env
+load_dotenv(verbose=DEBUG)
+
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
@@ -115,6 +119,14 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
-SLACK_OAUTH_REDIRECT = 'oauth/'
+SLACK_EVENT_URL = 'events'
+SLACK_OAUTH_URL = 'oauth'
+
+SLACK_AFTER_OAUTH = None
+
 SLACK_EVENTS = "papago_slack.slack_events"
 SLACK_SIGNING_SECRET = os.getenv("SLACK_SIGNING_SECRET")
+
+SLACK_APP_TOKEN = os.getenv("SLACK_APP_TOKEN")
+SLACK_CLIENT_ID = os.getenv("SLACK_CLIENT_ID")
+SLACK_CLIENT_SECRET = os.getenv("SLACK_CLIENT_SECRET")

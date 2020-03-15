@@ -16,7 +16,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 
+from . import views
+
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('slack/events', include("django_slack_app.urls")),
+    path('slack/', include("django_slack_app.urls")),
+
+    path('', views.home)
 ]
