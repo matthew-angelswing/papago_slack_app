@@ -1,10 +1,9 @@
-import os
 from pprint import pprint
 
 import hgtk
 import slack
 
-from django_slack_app import slack_events
+from django_slack_app import slack_events, slack_commands
 from django_slack_app.models import SlackUserToken
 from . import papago
 
@@ -43,3 +42,9 @@ def message_channels(event_data):
             channel=event["channel"], ts=event["ts"], text=new_text
         )
         assert response["ok"]
+
+
+@slack_commands.on("/papago")
+def papago_command(event_data):
+    print("PAPAGO COMAMNDS!!!")
+    pprint(event_data)

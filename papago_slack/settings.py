@@ -121,6 +121,7 @@ STATIC_URL = '/static/'
 
 SLACK_EVENT_URL = 'events'
 SLACK_OAUTH_URL = 'oauth'
+SLACK_COMMAND_URL = 'commands'
 
 SLACK_AFTER_OAUTH = None
 
