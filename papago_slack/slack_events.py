@@ -1,23 +1,30 @@
 from pprint import pprint
 
 import hgtk
-import slack
+from django_simple_slack_app import slack_events, slack_commands
 
-from django_slack_app import slack_events, slack_commands
-from django_slack_app.models import SlackUserToken
 from . import papago
+
+
+@slack_events.on("error")
+def on_event_error(error):
+    pprint(error)
 
 
 @slack_events.on("message")
 def message_channels(event_data):
+    pprint(event_data)
     event = event_data["event"]
 
     # event type checking
     if "text" not in event or "bot_id" in event or "subtype" in event:
         return
 
+    # auth check user
+    if "client" not in event:
+        return
+
     text = event["text"]
-    user = event["user"]
 
     # language checking
     if hgtk.checker.is_latin1(text):
@@ -27,24 +34,33 @@ def message_channels(event_data):
         print("Translate %s characters to English" % len(text))
         translated = papago.translate(text, "ko", "en")
 
-    # get user
-    try:
-        token = SlackUserToken.objects.get(user=user)
-        client = slack.WebClient(token=token.token)
-    except SlackUserToken.DoesNotExist:
-        print(f"not registed user {user}")
-        return
-
     # translating
     if translated:
         new_text = "%s\n> %s" % (text, translated.replace("\n", "\n> "))
-        response = client.chat_update(
+        response = event['client'].chat_update(
             channel=event["channel"], ts=event["ts"], text=new_text
         )
         assert response["ok"]
 
 
+@slack_commands.on("error")
+def on_command_error(error):
+    pprint(error)
+
+
 @slack_commands.on("/papago")
 def papago_command(event_data):
     print("PAPAGO COMAMNDS!!!")
+    pprint(event_data)
+
+
+@slack_commands.on("/papago.on")
+def papago_command(event_data):
+    print("PAPAGO ON!!!")
+    pprint(event_data)
+
+
+@slack_commands.on("/papago.off")
+def papago_command(event_data):
+    print("PAPAGO OFF!!!")
     pprint(event_data)
