@@ -1,14 +1,22 @@
 from pprint import pprint
 
 import hgtk
-from django_simple_slack_app import slack_events, slack_commands
+import requests
 
+from django_simple_slack_app import slack_events, slack_commands
 from . import papago
 
 
 @slack_events.on("error")
 def on_event_error(error):
+    print("Error caused for ", end="")
     pprint(error)
+
+
+@slack_events.on("oauth")
+def on_event_error(user):
+    print("OAuth finished for ", end="")
+    pprint(user)
 
 
 @slack_events.on("message")
@@ -21,7 +29,11 @@ def message_channels(event_data):
         return
 
     # auth check user
-    if "client" not in event:
+    if "client" not in event or 'user' not in event:
+        return
+
+    user = event['user']
+    if event['channel'] not in user.channels:
         return
 
     text = event["text"]
@@ -59,8 +71,28 @@ def papago_command(event_data):
     print("PAPAGO ON!!!")
     pprint(event_data)
 
+    if 'user' in event_data:
+        user = event_data['user']
+        user.channels.append(event_data['channel_id'])
+        user.save()
+
+        requests.post(event_data['response_url'], json={
+            "text": "Papago will translate on this channel for you!",
+            "response_type": "ephemeral"
+        })
+
 
 @slack_commands.on("/papago.off")
 def papago_command(event_data):
     print("PAPAGO OFF!!!")
     pprint(event_data)
+
+    if 'user' in event_data:
+        user = event_data['user']
+        user.channels.remove(event_data['channel_id'])
+        user.save()
+
+        requests.post(event_data['response_url'], json={
+            "text": "Papago translation is off!",
+            "response_type": "ephemeral"
+        })

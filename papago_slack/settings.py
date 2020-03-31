@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    'papago_slack',
     'django_simple_slack_app'
 ]
 
@@ -124,6 +125,7 @@ SLACK_OAUTH_URL = 'oauth'
 SLACK_COMMAND_URL = 'commands'
 
 SLACK_AFTER_OAUTH = None
+SLACK_USER_MODEL = "papago_slack.models.PapagoSlackUser"
 
 SLACK_EVENTS = "papago_slack.slack_events"
 SLACK_SIGNING_SECRET = os.getenv("SLACK_SIGNING_SECRET")
